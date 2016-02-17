@@ -36,7 +36,6 @@ Image.prototype.print = function(options) {
 		this.append(cmd);
 		this.append(widthLo);
 		this.append(widthHi);
-		
 	}
 };
 
@@ -49,23 +48,23 @@ Image.prototype.appendLineSpacing = function() {
  * Append image size to the output
  */
 Image.prototype.appendSize = function(size) {
-		switch (size) {
-			case ImageSize.DOUBLE_WIDTH:
-				this.append(this.config.S_RASTER_2W);
-				break;
-				
-			case ImageSize.DOUBLE_HEIGHT:
-				this.append(this.config.S_RASTER_2H);
-				break;
+	switch (size) {
+		case ImageSize.DOUBLE_WIDTH:
+			this.append(this.config.S_RASTER_2W);
+			break;
 			
-			case ImageSize.QUADRUPLE:
-				this.append(this.config.S_RASTER_Q);
-				break;
-			
-			default: // normal
-				this.append(this.config.S_RASTER_N);
-				break;
-		}
+		case ImageSize.DOUBLE_HEIGHT:
+			this.append(this.config.S_RASTER_2H);
+			break;
+		
+		case ImageSize.QUADRUPLE:
+			this.append(this.config.S_RASTER_Q);
+			break;
+		
+		default: // normal
+			this.append(this.config.S_RASTER_N);
+			break;
+	}
 }
 
 /**
@@ -79,18 +78,18 @@ function getDots(bitmap, threshold) {
 	var i = 0;
 	for (var iy = 0; iy < bitmap.height; ++iy) {
 		for (var ix = 0; ix < bitmap.width; ++ix) {
-					var pixel = bitmap.data[(bitmap.width * iy + ix) << 2];
-					var r = pixel >> 16 & 0xff;
-					var g = pixel >> 8 & 0xff;
-					var b = pixel & 0xff;
-					var lumi = (r * 0.3 + g * 0.59 + b * 0.11) | 0;
-					
-					if (lumi > threshold) {
-						var offset = Math.floor(i / 32);
-						var bit = i - offset * 32;
-						dots[offset] |= (1 << bit);
-					}
-					++i;
+				var pixel = bitmap.data[(bitmap.width * iy + ix) << 2];
+				var r = pixel >> 16 & 0xff;
+				var g = pixel >> 8 & 0xff;
+				var b = pixel & 0xff;
+				var lumi = (r * 0.3 + g * 0.59 + b * 0.11) | 0;
+				
+				if (lumi > threshold) {
+					var offset = Math.floor(i / 32);
+					var bit = i - offset * 32;
+					dots[offset] |= (1 << bit);
+				}
+				++i;
 			}
    }
 	
