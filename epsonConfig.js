@@ -90,4 +90,14 @@ module.exports = {
     PD_P50          : '\x1d\x7c\x08', // Printing Density +50%
     PD_P37          : '\x1d\x7c\x07', // Printing Density +37.5%
     PD_P25          : '\x1d\x7c\x06', // Printing Density +25%
+    
+    // Line spacing
+    LS_DEFAULT      : '\x1b\x32', // Default line spacing
+    LS_SET          : '\x1b\x33', // Set line spacing
+    
+    // Bit image
+    BIT_IMAGE_0     : '\x1b\x2a\x00', // vertical 203/3 dpi, horizontal 203/2 dpi, 8 dots
+    BIT_IMAGE_1     : '\x1b\x2a\x01', // vertical 203/3 dpi, horizontal 203 dpi, 8 dots
+    BIT_IMAGE_32    : '\x1b\x2a\x20', // vertical 203 dpi, horizontal 203/2 dpi, 24 dots
+    BIT_IMAGE_33    : '\x1b\x2a\x21'  // vertical 203 dpi, horitontal 203dpi, 24 dots
 }

@@ -5,6 +5,7 @@ var writeFile = require('write-file-queue')({
 });
 
 var net = require("net");
+var image = require('./image');
 var config = undefined;
 var printerConfig;
 var printText = "";
@@ -131,7 +132,15 @@ module.exports = {
         exists(ex);
       });
     }
-
+  },
+  
+  Image: image.Image,
+  
+  image: function(options, cb) {
+    options.append = append;
+    options.config = config;
+    
+    image.load(options, cb);
   }
 };
 
