@@ -23,25 +23,62 @@ var Image = function(dots, config, append) {
  */
 Image.prototype.print = function(options) {
 	
-	this.appendLineSpacing();
-	this.appendSize(options.size);
+	// line spacing 24
+	this.append(this.config.LS_SET); 
+	this.append('\x18');
+		
+  switch (options.size) {
+		case ImageSize.DOUBLE_WIDTH:
+			this.append(this.config.S_RASTER_2W);
+			break;
+			
+		case ImageSize.DOUBLE_HEIGHT:
+			this.append(this.config.S_RASTER_2H);
+			break;
+		
+		case ImageSize.QUADRUPLE:
+			this.append(this.config.S_RASTER_Q);
+			break;
+		
+		default: // ImageSize.NORMAL
+			this.append(this.config.S_RASTER_N);
+			break;
+	}
 	
-	var offset = 0;
-	
-	var cmd = this.dots.height <= 8 ? this.config.BIT_IMAGE_1 : this.config.BIT_IMAGE_33;
 	var widthLo = String.fromCharCode(this.dots.width & 0xff);
 	var widthHi = String.fromCharCode((this.dots.width >> 8) & 0xff);
 	
+	var offset = 0;
+	
 	while (offset < this.dots.height) {
-		this.append(cmd);
+		this.append(this.config.BIT_IMAGE_33);
 		this.append(widthLo);
 		this.append(widthHi);
+		
+		for (var x = 0; x < this.dots.width; ++x) {
+			for (var k = 0; k < 3; ++k) {
+				var slice = 0;
+				
+				for (var b = 0; b < 8; ++b) {
+					var y = ((((offset / 8) | 0) + k) * 8) + b
+					var i = (y * this.dots.width) + x;
+					
+					var v = false;
+					if (i < this.dots.length) {
+						var bit = i - Math.floor(i / 32) * 32;
+						v = !!(this.dots.data[i] & (1 << bit));
+					}
+					
+					slice |= (v ? 1 : 0) << (7 - b);
+				}
+				
+				this.append(slice);
+			}
+		}
+		
+		offset += 24;
+		this.append(this.config.CTL_LF);
 	}
-};
-
-Image.prototype.appendLineSpacing = function() {
-	this.append(this.config.LS_SET);
-	this.append('\x18'); // 24
 };
 
 /**
@@ -73,7 +110,8 @@ Image.prototype.appendSize = function(size) {
 function getDots(bitmap, threshold) {
 	threshold = threshold || 127;
 	
-	var dots = new ArrayBuffer(Math.ceil((bitmap.width * bitmap.height) / 32) * 4);
+	var length = bitmap.width * bitmap.height;
+	var dots = new ArrayBuffer(Math.ceil(length / 32) * 4);
 	
 	var i = 0;
 	for (var iy = 0; iy < bitmap.height; ++iy) {
@@ -94,16 +132,11 @@ function getDots(bitmap, threshold) {
    }
 	
 	return { 
-		data: new Uint32Array(dots), 
+		data: new Uint32Array(dots),
+		length: length,
 		width: bitmap.width,
 		height: bitmap.height
 	};
-}
-
-function getDot(i, data) {
-	var offset = Math.floor(i / 32);
-	var bit = i - offset * 32;
-	return !!(data[i] & (1 << bit));
 }
 
 function loadBitmap(file, cb) {
